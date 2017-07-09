@@ -1,5 +1,7 @@
 """
-Test a Strategy Learner.  (c) 2016 Tucker Balch
+Basic structure (c) 2016 Tucker Balch
+Implemented by Eric Zhang since 07/2016
+test code for the trading strategy using reinforcement learning
 """
 
 import pandas as pd

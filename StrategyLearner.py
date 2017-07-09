@@ -1,5 +1,6 @@
 """
-Template for implementing StrategyLearner  (c) 2016 Tucker Balch
+Basic structure (c) 2016 Tucker Balch
+Implemented by Eric Zhang since 07/2016
 """
 
 import datetime as dt
@@ -97,17 +98,29 @@ def add_MACD(data, Ns=[12, 26, 9]):
 
     return data
 
-def bin_divider(df_series, N=10):
+def bin_divider(df_series, N=10, method='quantile'):
     '''
     :param df_series: input in form of a pandas series
     :param N: number of bins to be divided to
+    :param method:
+            'percentile': cut series with same number of items in each bin
+            'even': bins have the same width
     :return: a list of values used as dividing values
     '''
     dropna = df_series.dropna()
-    sorted_s = dropna.values.argsort()
-    jump = int(math.ceil(len(sorted_s)/float(N)))
 
-    return list(dropna[sorted_s[jump::jump]].values)
+    if method=='quantile':
+        sorted_arg = dropna.values.argsort()
+        jump = int(math.ceil(len(sorted_arg)/float(N)))
+        cut_offs = list(dropna[sorted_arg[jump::jump]].values)
+    elif method=='even':
+        sorted_s = sorted(dropna)
+        cut_offs = [sorted_s[0]+i*(sorted_s[-1]-sorted_s[0])/float(N) for i in range(N)]
+#        width = (sorted_s[-1] - sorted_s[0])/float(N)
+#        cut_offs = list(np.linspace(sorted_s[0],sorted_s[-1],width))
+    else: print('Warning: invalid method')
+
+    return cut_offs
 
 def get_position(indicator,divider_list):
     # find the sorted position of the indicator value in a divider_list and return as state
@@ -232,9 +245,9 @@ class StrategyLearner(object):
         # create a dataframe within sd and ed
         df = data[sd:].copy()
         # generate dividing values to bin indicators
-        self.div_dict['mmt'] = bin_divider(df.mmt,N=self.bins)
-        self.div_dict['bbp'] = bin_divider(df.bbp,N=self.bins)
-        self.div_dict['MACD'] = bin_divider(df.MACD_sig,N=self.bins)
+        self.div_dict['mmt'] = bin_divider(df.mmt,N=self.bins, method='even')
+        self.div_dict['bbp'] = bin_divider(df.bbp,N=self.bins, method='even')
+        self.div_dict['MACD'] = bin_divider(df.MACD_sig,N=self.bins, method='even')
 
         # without considering holdings, get partial states based on indicators all at once
 #        ind_states = np.zeros((df.shape[0],1),dtype=int)
@@ -322,7 +335,7 @@ class StrategyLearner(object):
         data = add_MACD(data)
         data['MACD_sig'] = data.MACD - data.Signal
 
-        # find the true training starting day when market opene (data_sd is earlier than this day)
+        # find the true training starting day when market opens (data_sd is earlier than this day)
         temp = data.index[data.index>=sd]
         sd = temp[0]
 

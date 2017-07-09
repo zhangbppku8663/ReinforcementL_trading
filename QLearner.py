@@ -1,5 +1,7 @@
 """
-Template for implementing QLearner  (c) 2015 Tucker Balch
+Basic structure (c) 2016 Tucker Balch
+Implemented by Eric Zhang since 07/2016
+Q-learner class (part of reinforcement learning algorithm)
 """
 
 import numpy as np
