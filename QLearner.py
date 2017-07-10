@@ -11,15 +11,15 @@ import math
 
 class QLearner(object):
 
-    def __init__(self, \
-        num_states=100, \
-        num_actions = 4, \
-        alpha = 0.2, \
-        gamma = 0.9, \
-        rar = 0.98, \
-        radr = 0.95, \
-        dyna = 0, \
-        verbose = False):
+    def __init__(self,
+                 num_states=100,
+                 num_actions=4,
+                 alpha=0.2,
+                 gamma=0.9,
+                 rar=0.98,
+                 radr=0.95,
+                 dyna=0,
+                 verbose=False):
 
         self.verbose = verbose
         self.num_states = num_states

@@ -186,7 +186,7 @@ def print_port(of, sv=1000000, output=False, lvrg=False, symbol='SPY'):
 def test_code(verb=True):
 
     # instantiate the strategy learner
-    learner = sl.StrategyLearner(bins=10, verbose=verb)
+    learner = sl.StrategyLearner(bins=10, indicators=['mmt', 'bbp', 'MACD'], verbose=verb)
 
     # set parameters for training the learner
     sym = "VXX"
@@ -202,8 +202,8 @@ def test_code(verb=True):
     print 'Best return is', bestr
     # set parameters for testing
     # sym = "USO"
-    stdate = dt.datetime(2015, 8, 26)
-    enddate = dt.datetime(2016, 8, 26)
+    stdate = dt.datetime(2013, 8, 26)
+    enddate = dt.datetime(2015, 8, 26)
 
     syms = [sym]
     dates = pd.date_range(stdate, enddate)
@@ -212,8 +212,8 @@ def test_code(verb=True):
     if verb: print prices
     #
     # test the learner
-    df_trades = learner.testPolicy(symbol = sym, sd = stdate, \
-        ed = enddate, sv = 10000,N_bb=Nbb,N_mmt=Nmmt)
+    df_trades = learner.testPolicy(symbol=sym, sd=stdate, ed=enddate,
+                                   sv=10000, N_bb=Nbb, N_mmt=Nmmt)
     #
     # a few sanity checks
     # df_trades should be a single column DataFrame (not a series)
@@ -223,13 +223,12 @@ def test_code(verb=True):
     if prices.shape != df_trades.shape:
         print "Returned result is not the right shape"
     tradecheck = abs(df_trades.cumsum()).values
-    tradecheck[tradecheck<=100] = 0
-    tradecheck[tradecheck>0] = 1
+    tradecheck[tradecheck <= 100] = 0
+    tradecheck[tradecheck > 0] = 1
     if tradecheck.sum(axis=0) > 0:
-        print "Returned result violoates holding restrictions (more than 100 shares)"
+        print "Returned result violates holding restrictions (more than 100 shares)"
 
     if verb: print df_trades
-
 
     # generate orders based on principle
     orders, l_en, s_en, ext = generate_order(df_trades)
@@ -242,7 +241,6 @@ def test_code(verb=True):
         plt.axvline(x=i, color='r')
     for i in ext:
         plt.axvline(x=i, color='k')
-    # plt.axhline(y=)
     plt.show()
 
     # feed orders to the market simulator and print back-testing outputs
@@ -255,4 +253,4 @@ def test_code(verb=True):
     ind_dividers.to_csv(symbol_to_path('Dividers'))
 
 if __name__=="__main__":
-    test_code(verb = False)
+    test_code(verb=False)
