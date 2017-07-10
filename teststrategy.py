@@ -12,9 +12,10 @@ import matplotlib.pyplot as plt
 import os
 
 
-def symbol_to_path(symbol, base_dir=os.path.join("..", "mc3_p3")):
+def symbol_to_path(symbol, base_dir=os.path.join("..", "code")):
     """Return CSV file path given ticker symbol."""
     return os.path.join(base_dir, "{}.csv".format(str(symbol)))
+
 
 def generate_order(data):
     '''
@@ -55,6 +56,7 @@ def generate_order(data):
 
     return orders, l_en, s_en, ext
 
+
 def compute_portvals(orders_file, start_val=1000000, lvrg=False):
     '''
     :param orders_file: path and name of .csv order file
@@ -80,7 +82,6 @@ def compute_portvals(orders_file, start_val=1000000, lvrg=False):
     prtf['Cash'] = start_val
     prtf['Value'] = 0
     prtf_old = prtf.copy() # save portfolio before change
-    leverage = 0 # initialize leverage
     lev_old = 0 # save leverage from last time
     for idx in range(0,orders.shape[0]):
         # save original portfolio before process order
@@ -102,26 +103,25 @@ def compute_portvals(orders_file, start_val=1000000, lvrg=False):
             # now check the leverage
             longs = 0; shorts = 0
             for symbol in symbols:
-                if prtf.loc[orders.Date[idx],symbol+'_shares'] > 0:
-                    longs += prtf.loc[orders.Date[idx],symbol+'_shares']*prtf.loc[orders.Date[idx],symbol]
-                elif prtf.loc[orders.Date[idx],symbol+'_shares'] < 0:
-                    shorts += prtf.loc[orders.Date[idx],symbol+'_shares']*prtf.loc[orders.Date[idx],symbol]
-            leverage = (longs-shorts)/(longs+shorts+prtf.loc[orders.Date[idx],'Cash'])
+                if prtf.loc[orders.Date[idx], symbol+'_shares'] > 0:
+                    longs += prtf.loc[orders.Date[idx], symbol+'_shares']*prtf.loc[orders.Date[idx], symbol]
+                elif prtf.loc[orders.Date[idx], symbol+'_shares'] < 0:
+                    shorts += prtf.loc[orders.Date[idx], symbol+'_shares']*prtf.loc[orders.Date[idx], symbol]
+            leverage = (longs-shorts)/(longs+shorts+prtf.loc[orders.Date[idx], 'Cash'])
             if leverage > 2.0 and leverage >= lev_old:
                 prtf = prtf_old
             else:
                 lev_old = leverage
 
-
     for symbol in symbols:
-        prtf.Value = prtf.Value + prtf.loc[:,symbol+'_shares']*prtf.loc[:,symbol]
+        prtf.Value = prtf.Value + prtf.loc[:, symbol+'_shares']*prtf.loc[:, symbol]
     prtf.Value = prtf.Value + prtf.Cash
     portvals = prtf.Value
 
     return portvals, start_date, end_date
 
-def compute_portfolio_stats(port_val, rfr = 0.0, sf = 252.0):
 
+def compute_portfolio_stats(port_val, rfr=0.0, sf=252.0):
     # Get portfolio statistics (note: std_daily_ret = volatility)
     # Get daily portfolio value
     cr = port_val[-1]/port_val[0] - 1
@@ -132,12 +132,15 @@ def compute_portfolio_stats(port_val, rfr = 0.0, sf = 252.0):
 
     return cr, adr, sddr, sr
 
-def print_port(of, sv=1000000, output=False, lvrg=False):
+
+def print_port(of, sv=1000000, output=False, lvrg=False, symbol='SPY'):
     '''
     :param of: .csv order file
     :param sv: starting value of the portfolio
+    :param output: whether to output info
     :param lvrg: whether to consider leverage of the portfolio
-    :return:
+    :param symbol: stock symbol to consider
+    :return: void
     '''
 
     portvals, start_date, end_date = compute_portvals(orders_file=of, start_val=sv, lvrg=lvrg)
@@ -148,7 +151,7 @@ def print_port(of, sv=1000000, output=False, lvrg=False):
 
     cum_ret, avg_daily_ret, std_daily_ret, sharpe_ratio = compute_portfolio_stats(portvals)
     # SPX data originally has a'$" in front which creates problem as an improper name
-    symb_vals = ut.get_data(['NUGT'], pd.date_range(start_date, end_date))
+    symb_vals = ut.get_data([symbol], pd.date_range(start_date, end_date))
 
     cum_ret_SPY, avg_daily_ret_SPY, std_daily_ret_SPY, sharpe_ratio_SPY = compute_portfolio_stats(symb_vals.SPY_test)
 
@@ -179,27 +182,30 @@ def print_port(of, sv=1000000, output=False, lvrg=False):
         plt.legend(['Portfolio', 'SPY'], loc=2)
         plt.show()
 
-def test_code(verb = True):
+
+def test_code(verb=True):
 
     # instantiate the strategy learner
-    learner = sl.StrategyLearner(bins=10,verbose = verb)
+    learner = sl.StrategyLearner(bins=10, verbose=verb)
 
     # set parameters for training the learner
-    sym = "NUGT"
-    stdate = dt.datetime(2012,8,26)
+    sym = "VXX"
+    stdate = dt.datetime(2013,8,26)
     enddate = dt.datetime(2015,8,26)
-    Nbb = 24 # bollinger band looking back window
-    Nmmt = 3 # momentum looking back window
+    Nbb = 24  # bollinger band looking back window
+    Nmmt = 3  # momentum looking back window
     # train the learner
-    bestr = learner.addEvidence(symbol = sym, sd = stdate, \
-        ed = enddate, sv = 25000,N_bb=Nbb,N_mmt=Nmmt,it=55,output=True)
+    bestr = learner.addEvidence(symbol=sym, sd=stdate,
+                                ed=enddate, sv=25000,
+                                N_bb=Nbb, N_mmt=Nmmt,
+                                it=55, output=True)
     print 'Best return is', bestr
     # set parameters for testing
     # sym = "USO"
-    stdate =dt.datetime(2015,8,26)
-    enddate =dt.datetime(2016,8,26)
+    stdate = dt.datetime(2015, 8, 26)
+    enddate = dt.datetime(2016, 8, 26)
 
-    syms=[sym]
+    syms = [sym]
     dates = pd.date_range(stdate, enddate)
     prices_all = ut.get_data(syms, dates)  # automatically adds SPY
     prices = prices_all[syms]  # only portfolio symbols
@@ -212,7 +218,7 @@ def test_code(verb = True):
     # a few sanity checks
     # df_trades should be a single column DataFrame (not a series)
     # including only the values 100, 0, -100
-    if isinstance(df_trades, pd.DataFrame) == False:
+    if df_trades is not pd.DataFrame:
         print "Returned result is not a DataFrame"
     if prices.shape != df_trades.shape:
         print "Returned result is not the right shape"
@@ -240,7 +246,7 @@ def test_code(verb = True):
     plt.show()
 
     # feed orders to the market simulator and print back-testing outputs
-    print_port(of=orders, sv=10000, output=True, lvrg=False)
+    print_port(of=orders, sv=10000, output=True, lvrg=False, symbol=sym)
     # output Q table and indicator divider info
     q, dividers = learner.output()
     q_table = pd.DataFrame(q)

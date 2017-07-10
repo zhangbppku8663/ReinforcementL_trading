@@ -13,7 +13,7 @@ import time
 import os
 
 
-def symbol_to_path(symbol, base_dir=os.path.join("..", "mc3_p3")):
+def symbol_to_path(symbol, base_dir=os.path.join("..", "code")):
     """Return CSV file path given ticker symbol."""
     return os.path.join(base_dir, "{}.csv".format(str(symbol)))
 
@@ -56,7 +56,7 @@ def add_mmt(data, N=20):
 
 def cal_EMA(data_series, N):
     '''
-    :param data_serial: pandas series as time serial data
+    :param data_series: pandas series as time serial data
     :param N: looking-back window
     :return: 1-d array calculated EMA
     '''
@@ -78,15 +78,16 @@ def cal_EMA(data_series, N):
     return EMA
 
 
-def add_MACD(data, Ns=[12, 26, 9]):
+def add_MACD(data, Ns=None):
     '''
     :param data: DataFrame containing stock price info in the second column
     :param Ns: List of short term long term EMA to use and look-back window of MACD's EMA
     :return:
     '''
+    if Ns is None:
+        Ns = [12, 26, 9]
     symbol = data.columns.values[1]  # assuming stock price is in the second column in data
-    MACD = cal_EMA(data.ix[:, [symbol]], N=Ns[0]) - cal_EMA(data.ix[:, [symbol]], N=Ns[1])
-
+    MACD = cal_EMA(data.loc[:, symbol], N=Ns[0]) - cal_EMA(data.loc[:, symbol], N=Ns[1])
     data['MACD'] = MACD
     signal = cal_EMA(data.MACD[Ns[1]:], N=Ns[2])
     # # normalized them
@@ -97,6 +98,7 @@ def add_MACD(data, Ns=[12, 26, 9]):
     data.loc[Ns[1]:, 'Signal'] = signal
 
     return data
+
 
 def bin_divider(df_series, N=10, method='quantile'):
     '''
@@ -115,14 +117,15 @@ def bin_divider(df_series, N=10, method='quantile'):
         cut_offs = list(dropna[sorted_arg[jump::jump]].values)
     elif method=='even':
         sorted_s = sorted(dropna)
-        cut_offs = [sorted_s[0]+i*(sorted_s[-1]-sorted_s[0])/float(N) for i in range(N)]
+        cut_offs = [sorted_s[0]+(i+1)*(sorted_s[-1]-sorted_s[0])/float(N) for i in range(N-1)]
 #        width = (sorted_s[-1] - sorted_s[0])/float(N)
 #        cut_offs = list(np.linspace(sorted_s[0],sorted_s[-1],width))
     else: print('Warning: invalid method')
 
     return cut_offs
 
-def get_position(indicator,divider_list):
+
+def get_position(indicator, divider_list):
     # find the sorted position of the indicator value in a divider_list and return as state
     def indsorting(ind):
         lst = divider_list[:]
@@ -133,6 +136,7 @@ def get_position(indicator,divider_list):
     poses = indicator.apply(indsorting)
 
     return poses
+
 
 def get_state(ind_values, divider_dict):
     # get state given the space of indicators
@@ -160,12 +164,14 @@ def get_state(ind_values, divider_dict):
 
     return state.astype('int').flatten()
 
-def full_state(ind_states,holdings):
+
+def full_state(ind_states, holdings, num_of_ind=3):
     # generate states considering holdings
 
-    return int((holdings+100)*10+ind_states)
+    return int((holdings+100)*10**(num_of_ind-2)+ind_states)
 
-def set_sprime(data,date_ind,holdings,action):
+
+def set_sprime(data, date_ind, holdings, action):
     # action 0 SELL, 1 NOTHING, 2 BUY
     if holdings == 100:
         if action==2:
@@ -196,14 +202,12 @@ def set_sprime(data,date_ind,holdings,action):
 
     return s_prime, holdings
 
+
 class StrategyLearner(object):
 
     # constructor
-    def __init__(self, bins=10, verbose = False):
+    def __init__(self, bins=10, verbose=False):
         self.verbose = verbose
-#        self.mmt_div = []
-#        self.bbp_div = []
-#        self.MACD_div = []
         self.div_dict = {}
         self.bins = bins
         self.states_log = []
@@ -211,20 +215,24 @@ class StrategyLearner(object):
         self.total_states = []
 
     # this method should create a QLearner, and train it for trading
-    def addEvidence(self, symbol = "IBM", \
-        sd = dt.datetime(2008,1,1), \
-        ed = dt.datetime(2009,1,1), \
-        sv = 10000,N_mmt=20, N_bb=20, it=50, output=False):
+    def addEvidence(self, symbol="IBM",
+                    sd=dt.datetime(2008,1,1),
+                    ed=dt.datetime(2009,1,1),
+                    sv=10000,
+                    N_mmt=20,
+                    N_bb=20,
+                    it=50,
+                    output=False):
 
         # we need to read from the earliest possible date to get the same EMA for indicator calculations
         base_dir = os.path.join("..", "data")
         path = os.path.join(base_dir, "{}.csv".format(str(symbol)))
-        df_temp = pd.read_csv(path, parse_dates=True,index_col='Date',
-                              usecols=['Date','Adj Close'], na_values=['nan'])
-        data_sd = df_temp.index[-1]
+        df_temp = pd.read_csv(path, parse_dates=True, index_col='Date',
+                              usecols=['Date', 'Adj Close'], na_values=['nan'])
+        data_sd = sorted(df_temp.index)[0]
 
         # example usage of the old backward compatible util function
-        syms=[symbol]
+        syms = [symbol]
         dates = pd.date_range(data_sd, ed)
         prices_all = ut.get_data(syms, dates)  # automatically adds SPY
         prices = prices_all[syms]  # only portfolio symbols
@@ -232,11 +240,14 @@ class StrategyLearner(object):
         if self.verbose: print prices
 
         # calculate technical indicators
-        data = add_bband(prices_all,N=N_bb)
-        data = add_mmt(data,N=N_mmt)
+        data = add_bband(prices_all, N=N_bb)
+        data = add_mmt(data, N=N_mmt)
         data = add_MACD(data)
-        data['MACD_sig'] = data.MACD - data.Signal
+        # data['MACD_sig'] = data.MACD - data.Signal
 
+        indicators = ['mmt',
+                      'bbp',
+                      'MACD']
         # find the true training starting day when market opened (data_sd is earlier than this day)
 #        temp = data.index[data.index >= sd]
 #        sd = temp[0]
@@ -245,14 +256,10 @@ class StrategyLearner(object):
         # create a dataframe within sd and ed
         df = data[sd:].copy()
         # generate dividing values to bin indicators
-        self.div_dict['mmt'] = bin_divider(df.mmt,N=self.bins, method='even')
-        self.div_dict['bbp'] = bin_divider(df.bbp,N=self.bins, method='even')
-        self.div_dict['MACD'] = bin_divider(df.MACD_sig,N=self.bins, method='even')
+        for ind in indicators:
+            self.div_dict[ind] = bin_divider(df[ind],N=self.bins, method='even')
 
         # without considering holdings, get partial states based on indicators all at once
-#        ind_states = np.zeros((df.shape[0],1),dtype=int)
-#        for id in range(0,df.shape[0]):
-#            ind_states[id] = get_state([df.mmt[id],df.bbp[id],df.MACD_sig[id]],self.div_dict)
         ind_states = get_state(df[['mmt','bbp','MACD']],self.div_dict)
         df['Ind_States'] = ind_states
 
@@ -262,7 +269,7 @@ class StrategyLearner(object):
         for iteration in range(0,it):
 
             holdings = 0
-            start_state = full_state(df.loc[sd,'Ind_States'], holdings)
+            start_state = full_state(df.loc[sd,'Ind_States'], holdings, num_of_ind=len(indicators))
             action = self.learner.querysetstate(start_state)
             # log in states that has been in
             if start_state not in self.states_log:
@@ -312,16 +319,15 @@ class StrategyLearner(object):
             return bestr
 
     # this method should use the existing policy and test it against new data
-    def testPolicy(self, symbol = "IBM", \
-        sd=dt.datetime(2009,1,1), \
-        ed=dt.datetime(2010,1,1), \
-        sv = 10000, N_mmt=20, N_bb=20):
+    def testPolicy(self, symbol = "IBM",
+                   sd=dt.datetime(2009,1,1), ed=dt.datetime(2010,1,1),
+                   sv = 10000, N_mmt=20, N_bb=20):
 
         # we need to read from the earliest possible date to get the same EMA for indicator calculations
         base_dir = os.path.join("..", "data")
         path = os.path.join(base_dir, "{}.csv".format(str(symbol)))
         df_temp = pd.read_csv(path, parse_dates=True,index_col='Date', usecols=['Date','Adj Close'], na_values=['nan'])
-        data_sd = df_temp.index[-1]
+        data_sd = sorted(df_temp.index)[0]
 
         syms = [symbol]
         dates = pd.date_range(data_sd, ed)
