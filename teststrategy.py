@@ -190,7 +190,7 @@ def test_code(verb=True):
 
     # set parameters for training the learner
     sym = "VXX"
-    stdate = dt.datetime(2013,8,26)
+    stdate = dt.datetime(2014,8,26)
     enddate = dt.datetime(2015,8,26)
     Nbb = 24  # bollinger band looking back window
     Nmmt = 3  # momentum looking back window
@@ -198,12 +198,12 @@ def test_code(verb=True):
     bestr = learner.addEvidence(symbol=sym, sd=stdate,
                                 ed=enddate, sv=25000,
                                 N_bb=Nbb, N_mmt=Nmmt,
-                                it=55, output=True)
+                                it=10, output=True)
     print 'Best return is', bestr
     # set parameters for testing
     # sym = "USO"
-    stdate = dt.datetime(2013, 8, 26)
-    enddate = dt.datetime(2015, 8, 26)
+    stdate = dt.datetime(2015, 8, 26)
+    enddate = dt.datetime(2016, 8, 26)
 
     syms = [sym]
     dates = pd.date_range(stdate, enddate)
