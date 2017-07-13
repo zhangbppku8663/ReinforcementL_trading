@@ -86,11 +86,11 @@ def discretize(pos):
 
 # run the code to test a learner
 if __name__=="__main__":
-
+    np.random.seed(1234)
     verbose = False #print lots of debug stuff if True
 
     # read in the map
-    inf = open('testworlds/world03.csv')
+    inf = open('testworlds/world09.csv')
     data = np.array([map(float,s.strip().split(',')) for s in inf.readlines()])
     originalmap = data.copy() #make a copy so we can revert to the original map later
 
@@ -101,17 +101,17 @@ if __name__=="__main__":
 
     rand.seed(5)
 
-    learner = ql.QLearner(num_states=100,\
-        num_actions = 4, \
-        alpha = 0.2, \
-        gamma = 0.9, \
-        rar = 0.5, \
-        radr = 0.99, \
-        dyna = 200, \
-        verbose=False) #initialize the learner
+    learner = ql.QLearner(num_states=100,
+                          num_actions = 4,
+                          alpha = 0.2,
+                          gamma = 0.9,
+                          rar = 0.9,
+                          radr = 0.99,
+                          dyna = 100,
+                          verbose=False)
 
     #each iteration involves one trip to the goal
-    for iteration in range(0,50):
+    for iteration in range(0,60):
         steps = 0
         data = originalmap.copy()
         robopos = startpos

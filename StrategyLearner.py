@@ -203,7 +203,7 @@ class StrategyLearner(object):
                 # big number to wash out random initiation of Q-table
                 rwd = 100*(portv - portv_old)/portv
                 # query for the next action
-                action = self.learner.query(newstate,rwd,iteration)
+                action = self.learner.query(newstate,rwd)
 
                 holdings = newhold
                 portv_old = portv

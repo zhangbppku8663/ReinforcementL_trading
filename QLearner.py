@@ -26,7 +26,8 @@ class QLearner(object):
         self.num_actions = num_actions
         self.alpha = alpha
         self.gamma = gamma
-        self.rar = rar
+        self.rar = rar # save for checking dyna
+        self.newrar = rar # create a copy of rar to use in decay
         self.radr = radr
         self.s = 0
         self.a = 0
@@ -63,7 +64,7 @@ class QLearner(object):
 
         return action
 
-    def query(self,s_prime,r,iteration):
+    def query(self,s_prime,r):
         """
         @summary: Update the Q table and return an action
         @param s_prime: The new state
@@ -71,13 +72,14 @@ class QLearner(object):
         @param iteration: just to make sure we dont do dyna at the first query
         @returns: The selected action
         """
-        
+
+        is_first_iteration = self.newrar is self.rar
         # epsilon greedy select an action
-        if rand.random() > self.rar:
+        if rand.random() > self.newrar:
             action = self.Q_table[s_prime].argmax()
         else:
             action = int(math.floor((rand.random()*self.num_actions)))
-        self.rar *= self.radr # decaying random action
+        self.newrar *= self.radr # decaying random action
 
         # now update Q table
         self.Q_table[self.last_s, self.last_a] += \
@@ -85,7 +87,7 @@ class QLearner(object):
 
         if self.verbose: print "s =", s_prime,"a =",action,"r =",r
 
-        if self.dyna and iteration>0: # make sure we dont do dyna at the first query
+        if self.dyna and ~is_first_iteration: # make sure we dont do dyna at the first query
 
             if [self.last_s,self.last_a] not in self.visited:
                 self.visited.append([self.last_s,self.last_a])
