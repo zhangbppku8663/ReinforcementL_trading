@@ -11,6 +11,7 @@ import numpy as np
 import math
 import os
 
+np.random.seed(1234)
 
 def add_bband(data, N=20, Nsd=2):
     """
@@ -97,10 +98,11 @@ def add_MACD(data, Ns=None):
 class StrategyLearner(object):
 
     # constructor
-    def __init__(self, bins=10, indicators=None, verbose=False):
+    def __init__(self, bins=10, div_method='even', indicators=None, verbose=False):
         self.verbose = verbose
         self.div_dict = {}
         self.bins = bins
+        self.div_method = div_method
         self.states_log = []
         self.test_log = []
         self.evi_states = []
@@ -155,7 +157,7 @@ class StrategyLearner(object):
         self.df = data[sd:ed].copy()
         # generate dividing values to bin indicators
         for ind in self.indicators:
-            self.div_dict[ind] = self._bin_divider(indicator=ind, method='even')
+            self.div_dict[ind] = self._bin_divider(indicator=ind, method=self.div_method)
 
         # without considering holdings, get partial states based on indicators all at once
         self.df['Ind_States'] = self._get_state(self.df[self.indicators])
@@ -163,8 +165,8 @@ class StrategyLearner(object):
         self.learner = ql.QLearner(num_states=3000,
                                    num_actions=3,
                                    dyna=200,
-                                   rar=0.9999,
-                                   radr=0.9999,
+                                   rar=0.5,
+                                   radr=0.99,
                                    gamma=0.99,
                                    verbose=False)
 
@@ -309,14 +311,10 @@ class StrategyLearner(object):
             test_ind_states.append(int(item%1000))
         possible_states = list(set(test_ind_states))
 
-        for item in possible_states:
-            if item not in self.tdf.Ind_States:
-                print("Got one.\n")
-
         print 'Test session hit', len(possible_states),'states.'
         # get unseen states in test process not considering holdings
         for item in self.tdf.Ind_States:
-            if item not in self.df.Ind_States:
+            if item not in self.df.Ind_States.values:
                 not_seen.append(item)
         print len(set(not_seen)), "indicator states not seen before in training:",not_seen
 
@@ -373,11 +371,11 @@ class StrategyLearner(object):
 
         return s_prime, holdings
 
-    def _bin_divider(self, indicator, method='quantile'):
+    def _bin_divider(self, indicator, method='even'):
         '''
         :param indicator: related indicator name as string
         :param method:
-                'percentile': cut series with same number of items in each bin
+                'quantile': cut series with same number of items in each bin
                 'even': bins have the same width
         :return: a list of values used as dividing values
         '''
@@ -390,8 +388,6 @@ class StrategyLearner(object):
         elif method == 'even':
             sorted_s = sorted(dropna)
             cut_offs = [sorted_s[0] + (i + 1) * (sorted_s[-1] - sorted_s[0]) / float(self.bins) for i in range(self.bins - 1)]
-            #        width = (sorted_s[-1] - sorted_s[0])/float(N)
-            #        cut_offs = list(np.linspace(sorted_s[0],sorted_s[-1],width))
         else:
             cut_offs = None
             print('Warning: invalid method')
