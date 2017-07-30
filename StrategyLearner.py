@@ -9,90 +9,7 @@ import pandas as pd
 import util as ut
 import numpy as np
 import math
-import os
-
-
-def add_bband(data, N=20, Nsd=2):
-    """
-    :param data: dataframe containing price info of a stock
-    :param N: rolling days to compute mean and stdev
-    :param Nsd: how many times of stdev to add to deduct
-    :return: a data frame with percentage of bollinger band of price
-            calculated after first N days
-    """
-    symbol = data.columns.values[1]  # assuming stock price is in the second column in data
-    SMA_N = np.zeros((data.shape[0], 1))  # save the N day average price
-    stdev = np.zeros((data.shape[0], 1))  # save the  N day standard deviation
-    for idx in range(N - 1, data.shape[0]):
-        SMA_N[idx] = data.ix[idx - N + 1:idx + 1, [symbol]].sum() / N
-        stdev[idx] = data.ix[idx - N + 1:idx + 1, [symbol]].std()
-    SMA_N[SMA_N == 0] = 'NaN'  # reset zero valuses to NaN for proper plot
-
-    # Calculate upper and lower bands
-    bb_up = SMA_N + Nsd * stdev
-    bb_dn = SMA_N - Nsd * stdev
-    bb_up[bb_up == 0] = 'NaN'  # reset zero valuses to NaN for proper plot
-    bb_dn[bb_dn == 0] = 'NaN'  # reset zero valuses to NaN for proper plot
-
-    # calculate distance of current price to upper and lower bollinger band, respectively
-    bband = (data.ix[:, [symbol]] - bb_dn) / (bb_up - bb_dn)
-    data['bbp'] = bband
-
-    return data
-
-
-def add_mmt(data, N=20):
-
-    symbol = data.columns.values[1]  # assuming stock price is in the second column in data
-    data['mmt'] = data.ix[:, [symbol]] / data.ix[:, [symbol]].slice_shift(N - 1) - 1
-
-    return data
-
-
-def cal_EMA(data_series, N):
-    '''
-    :param data_series: pandas series as time serial data
-    :param N: looking-back window
-    :return: 1-d array calculated EMA
-    '''
-
-    SMA = np.zeros((data_series.shape[0], 1))
-
-    for idx in range(N - 1, data_series.shape[0]):
-        # assuming stock price is in the second column in data
-        SMA[idx] = data_series.ix[idx - N + 1:idx + 1].sum() / N
-
-    SMA[0:N] = 'NaN'
-
-    multi = 2.0 / (N + 1)
-    EMA = SMA
-    # EMA: {Close - EMA(previous day)} x multiplier + EMA(previous day).
-    for i in range(N + 1, EMA.shape[0]):
-        EMA[i] = (data_series.ix[i] - EMA[i - 1]) * multi + EMA[i - 1]
-
-    return EMA
-
-
-def add_MACD(data, Ns=None):
-    '''
-    :param data: DataFrame containing stock price info in the second column
-    :param Ns: List of short term long term EMA to use and look-back window of MACD's EMA
-    :return:
-    '''
-    if Ns is None:
-        Ns = [12, 26, 9]
-    symbol = data.columns.values[1]  # assuming stock price is in the second column in data
-    MACD = cal_EMA(data.loc[:, symbol], N=Ns[0]) - cal_EMA(data.loc[:, symbol], N=Ns[1])
-    data['MACD'] = MACD
-    signal = cal_EMA(data.MACD[Ns[1]:], N=Ns[2])
-    # # normalized them
-    # MACD = (MACD - np.nanmean(MACD))/(2*np.nanstd(MACD))
-    # signal  = (signal - np.nanmean(signal))/(2*np.nanstd(signal))
-    # data['MACD'] = MACD
-    data['Signal'] = 'NaN'
-    data.loc[Ns[1]:, 'Signal'] = signal
-
-    return data
+from util import symbol_to_path, add_bband, add_MACD, add_mmt
 
 
 class StrategyLearner(object):
@@ -125,8 +42,7 @@ class StrategyLearner(object):
                     output=False):
 
         # we need to read from the earliest possible date to get the same EMA for indicator calculations
-        base_dir = os.path.join("..", "data")
-        path = os.path.join(base_dir, "{}.csv".format(str(symbol)))
+        path = symbol_to_path(symbol=symbol)
         df_temp = pd.read_csv(path, parse_dates=True, index_col='Date',
                               usecols=['Date', 'Adj Close'], na_values=['nan'])
         data_sd = sorted(df_temp.index)[0]
@@ -155,6 +71,8 @@ class StrategyLearner(object):
 
         # create a dataframe within sd and ed
         self.df = data[sd:ed].copy()
+        # create a Series of dates for convenience
+        date_index = pd.Series(self.df.index)
         # generate dividing values to bin indicators
         for ind in self.indicators:
             self.div_dict[ind] = self._bin_divider(indicator=ind, method=self.div_method)
@@ -165,9 +83,9 @@ class StrategyLearner(object):
         self.learner = ql.QLearner(num_states=3000,
                                    num_actions=3,
                                    dyna=200,
-                                   rar=0.9,
-                                   radr=0.99,
-                                   gamma=0.99,
+                                   rar=0.999,
+                                   radr=0.999,
+                                   gamma=0.9,
                                    verbose=False)
 
         bestr = 0.0
@@ -180,7 +98,7 @@ class StrategyLearner(object):
             if start_state not in self.states_log:
                 self.states_log.append(start_state)
 
-            i = 1 # use to get one day ahead of current date
+            next_day = self.df.index[1] # use to get one day ahead of current date
             cash = sv; portv_old = sv
             for date in self.df.index[:-1]:
 
@@ -191,30 +109,31 @@ class StrategyLearner(object):
                     action = 1
 
                 # set the s prime state and holdings according to action
-                newstate, newhold = self.set_sprime(self.df,i,holdings,action)
+                newstate, newhold = self.set_sprime(self.df,next_day,holdings,action)
 
                 if newstate not in self.states_log:
                     self.states_log.append(newstate)
 
                 # calculate portfolio values. portv = cash + stock
-                cash -= self.df.ix[date,syms].values*(newhold-holdings)
-                portv = cash + self.df.ix[i,syms].values*newhold
+                cash -= self.df.loc[date,syms].values*(newhold-holdings)
+                portv = cash + self.df.loc[next_day,syms].values*newhold
                 # calculate the reward as daily portfolio return
                 # big number to wash out random initiation of Q-table
                 rwd = 100*(portv - portv_old)/portv
                 # query for the next action
-                action = self.learner.query(newstate,rwd)
+                action = self.learner.query(newstate, rwd, iteration)
 
                 holdings = newhold
                 portv_old = portv
-                i += 1
+                today_date = list(date_index).index(date)
+                next_day = date_index[today_date+1]
 
             print 'CumRet is:', float(portv)/sv - 1
             if output == True and iteration > 50:  # record the best portv after 50 iterations
                 if float(portv)/sv - 1 > bestr:
                     bestr = float(portv)/sv - 1
             print 'Explored states:', len(self.states_log)
-            print iteration, ':', i, 'days of trading'
+            print iteration, ':', len(date_index), 'days of trading'
 
         self.evi_states = list(set(self.df.Ind_States.values))
         print "We have", len(self.evi_states),"states initially not considering holdings."
@@ -229,8 +148,7 @@ class StrategyLearner(object):
                    sv = 10000, N_mmt=20, N_bb=20):
 
         # we need to read from the earliest possible date to get the same EMA for indicator calculations
-        base_dir = os.path.join("..", "data")
-        path = os.path.join(base_dir, "{}.csv".format(str(symbol)))
+        path = symbol_to_path(symbol=symbol)
         df_temp = pd.read_csv(path, parse_dates=True,index_col='Date', usecols=['Date','Adj Close'], na_values=['nan'])
         data_sd = sorted(df_temp.index)[0]
 
@@ -257,18 +175,20 @@ class StrategyLearner(object):
 
         # create a dataframe within sd and ed
         self.tdf = data[sd:ed].copy()
-
+        # create a Series of dates for convenience
+        date_index = pd.Series(self.tdf.index)
         # without considering holdings, get partial states based on indicators all at once
         self.tdf['Ind_States'] = self._get_state(self.tdf[self.indicators])
 
-        trades = data[[symbol,]][sd:].copy()  # only portfolio symbols from start date to end date
-        trades.values[:, :] = 0  # set them all to nothing
+        # trades = data[[symbol,]][sd:].copy()  # only portfolio symbols from start date to end date
+        trades = data.loc[sd:, symbol]
+        trades[:] = 0  # set them all to nothing
         holdings = 0
         start_state = self._full_state(self.tdf.loc[sd, 'Ind_States'], holdings)
         if start_state not in self.test_log:
             self.test_log.append(start_state)
         action = self.learner.querysetstate(start_state)
-        i = 1; portv = 0
+        next_day = self.tdf.index[1]; portv = 0
         cash = sv
         for date in self.tdf.index[:-1]:
 
@@ -279,7 +199,7 @@ class StrategyLearner(object):
                 action = 1
 
             # set the s prime state according to action
-            newstate, newhold = self.set_sprime(self.tdf, i, holdings, action)
+            newstate, newhold = self.set_sprime(self.tdf, next_day, holdings, action)
             # record states
             if newstate not in self.test_log:
                 self.test_log.append(newstate)
@@ -287,21 +207,22 @@ class StrategyLearner(object):
             # record trades
             if not newhold==holdings:
                 if action == 2:
-                    trades.values[i-1,:] = 100
+                    trades[date] = 100
                 elif action == 0:
-                    trades.values[i-1,:] = -100
+                    trades[date] = -100
 
-            # calculate portfolio values. portv = cash + stock
-            cash -= int(self.tdf.ix[date, syms].values * (newhold - holdings))
-            portv = cash + int(self.tdf.ix[i, syms].values * newhold)
+            # calculate portfolio values. portv = cash today + stock value today
+            cash -= int(self.tdf.loc[date, syms].values * (newhold - holdings))
+            portv = cash + int(self.tdf.loc[date, syms].values * newhold)
             # query for the next action
             action = self.learner.querysetstate(newstate)
             holdings = newhold
-            i += 1
+            today_index = list(date_index).index(date)
+            next_day = date_index[today_index+1]
 
         print float(portv) / sv - 1
 
-        if self.verbose: print type(trades) # it better be a DataFrame!
+        if self.verbose: print type(trades) # it better be a Series!
         if self.verbose: print trades
         # if self.verbose: print prices_all
 
@@ -326,18 +247,13 @@ class StrategyLearner(object):
         self.states_log.sort()
         logs = {'Learned':self.states_log,'Tested':self.test_log}
         states = pd.DataFrame(logs)
-        states.to_csv(self._symbol_to_path('States'))
+        states.to_csv(symbol_to_path('States'), index=False)
 
         return trades
 
     def output(self):
         q_table = self.learner.output_q()
         return q_table, self.div_dict
-
-    @staticmethod
-    def _symbol_to_path(symbol, base_dir=os.path.join("..", "code")):
-        """Return CSV file path given ticker symbol."""
-        return os.path.join(base_dir, "{}.csv".format(str(symbol)))
 
     @staticmethod
     def set_sprime(data, date_ind, holdings, action):
@@ -367,7 +283,7 @@ class StrategyLearner(object):
             elif action == 0:
                 pass
                 # print 'Not allowed holdings'
-        s_prime = int(data.ix[date_ind, 'Ind_States'] + 10 * (holdings + 100))
+        s_prime = int(data.loc[date_ind, 'Ind_States'] + 10 * (holdings + 100))
 
         return s_prime, holdings
 

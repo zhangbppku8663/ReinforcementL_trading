@@ -9,13 +9,8 @@ import datetime as dt
 import util as ut
 import StrategyLearner as sl
 import matplotlib.pyplot as plt
-import os
 import numpy as np
-
-
-def symbol_to_path(symbol, base_dir=os.path.join("..", "code")):
-    """Return CSV file path given ticker symbol."""
-    return os.path.join(base_dir, "{}.csv".format(str(symbol)))
+from util import symbol_to_path
 
 
 def generate_order(data):
@@ -26,7 +21,7 @@ def generate_order(data):
     '''
     order = []; idx = 0; shares = 0
     date_list = data.index.values
-    symbol = data.columns.values[0] # assume the first column stores symbol info
+    symbol = data.name # assume the name of Series stores symbol info
     l_en = []; s_en = []; ext = []
     while idx < data.shape[0]:
 
@@ -199,8 +194,9 @@ def test_code(verb=True):
     bestr = learner.addEvidence(symbol=sym, sd=stdate,
                                 ed=enddate, sv=25000,
                                 N_bb=Nbb, N_mmt=Nmmt,
-                                it=55, output=True)
-    print 'Best return is', bestr
+                                it=2, output=True)
+    print('Best return is', bestr)
+    print(learner.learner.newrar)
     # set parameters for testing
     # sym = "USO"
     stdate = dt.datetime(2015, 1, 26)
@@ -214,13 +210,13 @@ def test_code(verb=True):
     #
     # test the learner
     df_trades = learner.testPolicy(symbol=sym, sd=stdate, ed=enddate,
-                                   sv=10000, N_bb=Nbb, N_mmt=Nmmt)
+                                   sv=100000, N_bb=Nbb, N_mmt=Nmmt)
     #
     # a few sanity checks
-    # df_trades should be a single column DataFrame (not a series)
+    # df_trades should be a series)
     # including only the values 100, 0, -100
-    if df_trades is not pd.DataFrame:
-        print "Returned result is not a DataFrame"
+    if type(df_trades) is not pd.core.series.Series:
+        print "Returned result is not a Series"
     if prices.shape != df_trades.shape:
         print "Returned result is not the right shape"
     tradecheck = abs(df_trades.cumsum()).values

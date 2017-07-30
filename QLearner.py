@@ -29,10 +29,9 @@ class QLearner(object):
         self.rar = rar # save for checking dyna
         self.newrar = rar # create a copy of rar to use in decay
         self.radr = radr
-        self.s = 0
-        self.a = 0
+        self.s = 0  # state
+        self.a = 0  # action
         self.Q_table = np.random.rand(num_states,num_actions)*2 - 1
-        # self.Q_table = np.zeros((num_states,num_actions))
         self.last_s = 0 # save the last state
         self.last_a = 0 # save the last action
         self.dyna = dyna
@@ -54,22 +53,20 @@ class QLearner(object):
             action = self.Q_table[s].argmax()
         else:
             action = int(math.floor((rand.random() * self.num_actions)))
-        self.rar *= self.radr  # decaying random action
+        # self.rar *= self.radr  # decaying random action
 
         if self.verbose: print "s =", s,"a =",action
-        # print self.Q_table[100]
         # save last move info
         self.last_s = s
         self.last_a = action
 
         return action
 
-    def query(self,s_prime,r):
+    def query(self, s_prime, r, iteration):
         """
         @summary: Update the Q table and return an action
         @param s_prime: The new state
         @param r: The ne state
-        @param iteration: just to make sure we dont do dyna at the first query
         @returns: The selected action
         """
         # check if this is the first iteration, if yes, no dyna
@@ -87,10 +84,10 @@ class QLearner(object):
 
         if self.verbose: print "s =", s_prime,"a =",action,"r =",r
 
-        if self.dyna and ~is_first_iteration: # make sure we dont do dyna at the first query
-
+        # if self.dyna and (not is_first_iteration): # make sure we dont do dyna at the first query
+        if self.dyna and iteration:
             if [self.last_s,self.last_a] not in self.visited:
-                self.visited.append([self.last_s,self.last_a])
+                self.visited.append([self.last_s, self.last_a])
                 self.T_ct[(self.last_s, self.last_a)] = []
             self.T_ct[(self.last_s, self.last_a)].append(s_prime)
             self.R_table[self.last_s, self.last_a] = (1-self.alpha)*self.R_table[self.last_s, self.last_a] + self.alpha*r
