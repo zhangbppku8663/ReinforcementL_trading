@@ -72,7 +72,7 @@ class QLearner(object):
         @param iteration: just to make sure we dont do dyna at the first query
         @returns: The selected action
         """
-
+        # check if this is the first iteration, if yes, no dyna
         is_first_iteration = self.newrar is self.rar
         # epsilon greedy select an action
         if rand.random() > self.newrar:

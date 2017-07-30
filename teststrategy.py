@@ -187,12 +187,12 @@ def print_port(of, sv=1000000, output=False, lvrg=False, symbol='SPY'):
 def test_code(verb=True):
 
     # instantiate the strategy learner
-    learner = sl.StrategyLearner(bins=10, div_method='quantile', indicators=['mmt', 'bbp', 'MACD'], verbose=verb)
+    learner = sl.StrategyLearner(bins=10, div_method='quantile', indicators=['mmt', 'bbp'], verbose=verb)
 
     # set parameters for training the learner
     sym = "AAPL"
-    stdate = dt.datetime(2014,1,26)
-    enddate = dt.datetime(2016,8,26)
+    stdate = dt.datetime(2015,1,26)
+    enddate = dt.datetime(2016,12,26)
     Nbb = 24  # bollinger band looking back window
     Nmmt = 3  # momentum looking back window
     # train the learner
@@ -203,8 +203,8 @@ def test_code(verb=True):
     print 'Best return is', bestr
     # set parameters for testing
     # sym = "USO"
-    stdate = dt.datetime(2016, 8, 26)
-    enddate = dt.datetime(2017, 3, 26)
+    stdate = dt.datetime(2015, 1, 26)
+    enddate = dt.datetime(2016, 12, 26)
 
     syms = [sym]
     dates = pd.date_range(stdate, enddate)

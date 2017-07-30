@@ -11,7 +11,6 @@ import numpy as np
 import math
 import os
 
-np.random.seed(1234)
 
 def add_bband(data, N=20, Nsd=2):
     """
@@ -95,6 +94,7 @@ def add_MACD(data, Ns=None):
 
     return data
 
+
 class StrategyLearner(object):
 
     # constructor
@@ -165,7 +165,7 @@ class StrategyLearner(object):
         self.learner = ql.QLearner(num_states=3000,
                                    num_actions=3,
                                    dyna=200,
-                                   rar=0.5,
+                                   rar=0.9,
                                    radr=0.99,
                                    gamma=0.99,
                                    verbose=False)
