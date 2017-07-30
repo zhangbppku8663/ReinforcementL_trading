@@ -1,16 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="007f365b-ccb9-4cf2-b0b4-46d3b0b177e3" name="Default" comment="First time to use PyCharm to push to github">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Dividers.csv" afterPath="$PROJECT_DIR$/Dividers.csv" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/QLearner.py" afterPath="$PROJECT_DIR$/QLearner.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Q_Table.csv" afterPath="$PROJECT_DIR$/Q_Table.csv" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/States.csv" afterPath="$PROJECT_DIR$/States.csv" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/StrategyLearner.py" afterPath="$PROJECT_DIR$/StrategyLearner.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/orders.csv" afterPath="$PROJECT_DIR$/orders.csv" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/teststrategy.py" afterPath="$PROJECT_DIR$/teststrategy.py" />
-    </list>
+    <list default="true" id="007f365b-ccb9-4cf2-b0b4-46d3b0b177e3" name="Default" comment="First time to use PyCharm to push to github" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -90,16 +81,6 @@
               <folding>
                 <element signature="e#146#164#0" expanded="true" />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="QLearner_backup.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/QLearner_backup.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="391">
-              <caret line="24" column="36" lean-forward="false" selection-start-line="24" selection-start-column="0" selection-end-line="25" selection-end-column="0" />
-              <folding />
             </state>
           </provider>
         </entry>
@@ -692,14 +673,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/QLearner_backup.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="391">
-          <caret line="24" column="36" lean-forward="false" selection-start-line="24" selection-start-column="0" selection-end-line="25" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/teststrategy.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="145">
@@ -739,6 +712,14 @@
             <element signature="e#15502#16708#0" expanded="false" />
             <element signature="e#16767#16912#0" expanded="false" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/QLearner_backup.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="391">
+          <caret line="24" column="36" lean-forward="false" selection-start-line="24" selection-start-column="0" selection-end-line="25" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>
