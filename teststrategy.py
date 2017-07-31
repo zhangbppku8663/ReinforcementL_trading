@@ -11,6 +11,7 @@ import StrategyLearner as sl
 import matplotlib.pyplot as plt
 import numpy as np
 from util import symbol_to_path
+import os
 
 
 def generate_order(data):
@@ -185,31 +186,32 @@ def test_code(verb=True):
     learner = sl.StrategyLearner(bins=10, div_method='quantile', indicators=['mmt', 'bbp'], verbose=verb)
 
     # set parameters for training the learner
-    sym = "AAPL"
+    sym = "NUGT"
     stdate = dt.datetime(2015,1,26)
-    enddate = dt.datetime(2016,12,26)
+    enddate = dt.datetime(2017,7,1)
     Nbb = 24  # bollinger band looking back window
     Nmmt = 3  # momentum looking back window
     # train the learner
     bestr = learner.addEvidence(symbol=sym, sd=stdate,
                                 ed=enddate, sv=25000,
                                 N_bb=Nbb, N_mmt=Nmmt,
-                                it=2, output=True)
+                                it=50, output=True)
     print('Best return is', bestr)
-    print(learner.learner.newrar)
-    # set parameters for testing
-    # sym = "USO"
-    stdate = dt.datetime(2015, 1, 26)
-    enddate = dt.datetime(2016, 12, 26)
+    print('Now rar is:', learner.learner.newrar)
+    #############
+    # Test
+    #############
+    st_date = dt.datetime(2017, 7, 1)
+    en_date = dt.datetime(2017, 7, 26)
 
     syms = [sym]
-    dates = pd.date_range(stdate, enddate)
+    dates = pd.date_range(st_date, en_date)
     prices_all = ut.get_data(syms, dates)  # automatically adds SPY
     prices = prices_all[syms]  # only portfolio symbols
     if verb: print prices
     #
     # test the learner
-    df_trades = learner.testPolicy(symbol=sym, sd=stdate, ed=enddate,
+    df_trades = learner.testPolicy(symbol=sym, sd=st_date, ed=en_date,
                                    sv=100000, N_bb=Nbb, N_mmt=Nmmt)
     #
     # a few sanity checks
@@ -229,7 +231,7 @@ def test_code(verb=True):
 
     # generate orders based on principle
     orders, l_en, s_en, ext = generate_order(df_trades)
-    orders.to_csv(symbol_to_path('orders'))
+    orders.to_csv(symbol_to_path('orders', base_dir=os.getcwd()))
     # for plot
     plt.plot(prices)
     for i in l_en:
@@ -246,8 +248,8 @@ def test_code(verb=True):
     q, dividers = learner.output()
     q_table = pd.DataFrame(q)
     ind_dividers = pd.DataFrame(dividers)
-    q_table.to_csv(symbol_to_path('Q_Table'))
-    ind_dividers.to_csv(symbol_to_path('Dividers'))
+    q_table.to_csv(symbol_to_path('Q_Table', base_dir=os.getcwd()))
+    ind_dividers.to_csv(symbol_to_path('Dividers', base_dir=os.getcwd()))
 
 if __name__=="__main__":
     np.random.seed(1234)

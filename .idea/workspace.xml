@@ -1,18 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="BookmarkManager">
-    <bookmark url="file://$PROJECT_DIR$/teststrategy.py" line="189" mnemonic="9" />
+    <bookmark url="file://$PROJECT_DIR$/teststrategy.py" line="190" mnemonic="9" />
   </component>
   <component name="ChangeListManager">
     <list default="true" id="007f365b-ccb9-4cf2-b0b4-46d3b0b177e3" name="Default" comment="First time to use PyCharm to push to github">
+      <change type="DELETED" beforePath="$PROJECT_DIR$/data/Dividers.csv" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/data/Q_Table.csv" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/data/States.csv" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/data/orders.csv" afterPath="" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Dividers.csv" afterPath="$PROJECT_DIR$/Dividers.csv" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/QLearner.py" afterPath="$PROJECT_DIR$/QLearner.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Q_Table.csv" afterPath="$PROJECT_DIR$/Q_Table.csv" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/States.csv" afterPath="$PROJECT_DIR$/States.csv" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/StrategyLearner.py" afterPath="$PROJECT_DIR$/StrategyLearner.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/data/SPY_test.csv" afterPath="$PROJECT_DIR$/data/SPY_test.csv" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/orders.csv" afterPath="$PROJECT_DIR$/orders.csv" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/teststrategy.py" afterPath="$PROJECT_DIR$/teststrategy.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/util.py" afterPath="$PROJECT_DIR$/util.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -30,16 +35,11 @@
       <file leaf-file-name="StrategyLearner.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/StrategyLearner.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="126">
-              <caret line="179" column="34" lean-forward="false" selection-start-line="179" selection-start-column="34" selection-end-line="179" selection-end-column="34" />
+            <state relative-caret-position="153">
+              <caret line="9" column="18" lean-forward="true" selection-start-line="9" selection-start-column="18" selection-end-line="9" selection-end-column="18" />
               <folding>
-                <element signature="e#87#108#0" expanded="true" />
-                <element signature="e#10382#10453#0" expanded="false" />
-                <element signature="e#10535#11362#0" expanded="false" />
-                <element signature="e#11426#12280#0" expanded="false" />
-                <element signature="e#12331#12706#0" expanded="false" />
-                <element signature="e#12755#13961#0" expanded="false" />
-                <element signature="e#14020#14165#0" expanded="false" />
+                <element signature="e#10417#10488#0" expanded="false" />
+                <element signature="e#14118#14263#0" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -48,12 +48,14 @@
       <file leaf-file-name="teststrategy.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/teststrategy.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="238">
-              <caret line="218" column="47" lean-forward="true" selection-start-line="218" selection-start-column="47" selection-end-line="218" selection-end-column="47" />
+            <state relative-caret-position="177">
+              <caret line="197" column="37" lean-forward="false" selection-start-line="197" selection-start-column="37" selection-end-line="197" selection-end-column="37" />
               <folding>
                 <element signature="e#151#170#0" expanded="true" />
-                <element signature="e#4721#5051#0" expanded="false" />
-                <element signature="e#5130#7155#0" expanded="false" />
+                <element signature="e#365#1776#0" expanded="false" />
+                <element signature="e#1849#4666#0" expanded="false" />
+                <element signature="e#4731#5061#0" expanded="false" />
+                <element signature="e#5140#7165#0" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -62,9 +64,10 @@
       <file leaf-file-name="util.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/util.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="51">
-              <caret line="3" column="26" lean-forward="false" selection-start-line="3" selection-start-column="26" selection-end-line="3" selection-end-column="26" />
+            <state relative-caret-position="85">
+              <caret line="5" column="18" lean-forward="true" selection-start-line="5" selection-start-column="18" selection-end-line="5" selection-end-column="18" />
               <folding>
+                <element signature="e#25#34#0" expanded="true" />
                 <element signature="e#2572#2761#0" expanded="false" />
                 <element signature="e#2797#3429#0" expanded="false" />
                 <element signature="e#3465#4214#0" expanded="false" />
@@ -76,8 +79,8 @@
       <file leaf-file-name="QLearner.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/QLearner.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="190">
-              <caret line="33" column="17" lean-forward="true" selection-start-line="33" selection-start-column="17" selection-end-line="33" selection-end-column="17" />
+            <state relative-caret-position="362">
+              <caret line="83" column="0" lean-forward="false" selection-start-line="83" selection-start-column="0" selection-end-line="83" selection-end-column="0" />
               <folding>
                 <element signature="e#146#164#0" expanded="true" />
               </folding>
@@ -89,14 +92,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>_get_position</find>
-      <find>N</find>
-      <find>dict</find>
-      <find>holding</find>
-      <find>holdings</find>
-      <find>_full_st</find>
-      <find>compute</find>
-      <find>QL</find>
       <find>datetime</find>
       <find>dyna</find>
       <find>newrar</find>
@@ -107,7 +102,6 @@
       <find>query</find>
       <find>add</find>
       <find>symbol_to</find>
-      <find>self.newrar</find>
       <find>to_csv</find>
       <find>symbol_to_path</find>
       <find>Returned</find>
@@ -117,8 +111,17 @@
       <find>trade</find>
       <find>df_trad</find>
       <find>generate</find>
-      <find>print_p</find>
       <find>order</find>
+      <find>print_p</find>
+      <find>Best return is</find>
+      <find>Best re</find>
+      <find>Best return</find>
+      <find>self.newrar</find>
+      <find>self.learner</find>
+      <find>Best return</find>
+      <find>set_sp</find>
+      <find>orders</find>
+      <find>States</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -485,7 +488,7 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <option name="time" value="5" />
+      <option name="time" value="6" />
     </breakpoint-manager>
     <watches-manager />
   </component>
@@ -495,13 +498,8 @@
         <state relative-caret-position="1292">
           <caret line="167" column="42" lean-forward="false" selection-start-line="167" selection-start-column="42" selection-end-line="167" selection-end-column="42" />
           <folding>
-            <element signature="e#87#108#0" expanded="true" />
-            <element signature="e#10382#10453#0" expanded="false" />
-            <element signature="e#10535#11362#0" expanded="false" />
-            <element signature="e#11426#12280#0" expanded="false" />
-            <element signature="e#12331#12706#0" expanded="false" />
-            <element signature="e#12755#13961#0" expanded="false" />
-            <element signature="e#14020#14165#0" expanded="false" />
+            <element signature="e#10417#10488#0" expanded="false" />
+            <element signature="e#14118#14263#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -538,8 +536,10 @@
           <caret line="205" column="27" lean-forward="false" selection-start-line="205" selection-start-column="27" selection-end-line="205" selection-end-column="27" />
           <folding>
             <element signature="e#151#170#0" expanded="true" />
-            <element signature="e#4721#5051#0" expanded="false" />
-            <element signature="e#5130#7155#0" expanded="false" />
+            <element signature="e#365#1776#0" expanded="false" />
+            <element signature="e#1849#4666#0" expanded="false" />
+            <element signature="e#4731#5061#0" expanded="false" />
+            <element signature="e#5140#7165#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -549,13 +549,8 @@
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <element signature="e#87#108#0" expanded="true" />
-            <element signature="e#10382#10453#0" expanded="false" />
-            <element signature="e#10535#11362#0" expanded="false" />
-            <element signature="e#11426#12280#0" expanded="false" />
-            <element signature="e#12331#12706#0" expanded="false" />
-            <element signature="e#12755#13961#0" expanded="false" />
-            <element signature="e#14020#14165#0" expanded="false" />
+            <element signature="e#10417#10488#0" expanded="false" />
+            <element signature="e#14118#14263#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -566,8 +561,10 @@
           <caret line="20" column="25" lean-forward="false" selection-start-line="20" selection-start-column="25" selection-end-line="20" selection-end-column="25" />
           <folding>
             <element signature="e#151#170#0" expanded="true" />
-            <element signature="e#4721#5051#0" expanded="false" />
-            <element signature="e#5130#7155#0" expanded="false" />
+            <element signature="e#365#1776#0" expanded="false" />
+            <element signature="e#1849#4666#0" expanded="false" />
+            <element signature="e#4731#5061#0" expanded="false" />
+            <element signature="e#5140#7165#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -603,13 +600,8 @@
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <element signature="e#87#108#0" expanded="true" />
-            <element signature="e#10382#10453#0" expanded="false" />
-            <element signature="e#10535#11362#0" expanded="false" />
-            <element signature="e#11426#12280#0" expanded="false" />
-            <element signature="e#12331#12706#0" expanded="false" />
-            <element signature="e#12755#13961#0" expanded="false" />
-            <element signature="e#14020#14165#0" expanded="false" />
+            <element signature="e#10417#10488#0" expanded="false" />
+            <element signature="e#14118#14263#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -619,13 +611,8 @@
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <element signature="e#87#108#0" expanded="true" />
-            <element signature="e#10382#10453#0" expanded="false" />
-            <element signature="e#10535#11362#0" expanded="false" />
-            <element signature="e#11426#12280#0" expanded="false" />
-            <element signature="e#12331#12706#0" expanded="false" />
-            <element signature="e#12755#13961#0" expanded="false" />
-            <element signature="e#14020#14165#0" expanded="false" />
+            <element signature="e#10417#10488#0" expanded="false" />
+            <element signature="e#14118#14263#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -668,28 +655,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/util.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="51">
-          <caret line="3" column="26" lean-forward="false" selection-start-line="3" selection-start-column="26" selection-end-line="3" selection-end-column="26" />
-          <folding>
-            <element signature="e#2572#2761#0" expanded="false" />
-            <element signature="e#2797#3429#0" expanded="false" />
-            <element signature="e#3465#4214#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/QLearner.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="190">
-          <caret line="33" column="17" lean-forward="true" selection-start-line="33" selection-start-column="17" selection-end-line="33" selection-end-column="17" />
-          <folding>
-            <element signature="e#146#164#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/../../PhD/Courses/CS7646/Projects/mc3_p3/StrategyLearner.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-943">
@@ -706,30 +671,50 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/util.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="85">
+          <caret line="5" column="18" lean-forward="true" selection-start-line="5" selection-start-column="18" selection-end-line="5" selection-end-column="18" />
+          <folding>
+            <element signature="e#25#34#0" expanded="true" />
+            <element signature="e#2572#2761#0" expanded="false" />
+            <element signature="e#2797#3429#0" expanded="false" />
+            <element signature="e#3465#4214#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/QLearner.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="362">
+          <caret line="83" column="0" lean-forward="false" selection-start-line="83" selection-start-column="0" selection-end-line="83" selection-end-column="0" />
+          <folding>
+            <element signature="e#146#164#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/StrategyLearner.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="126">
-          <caret line="179" column="34" lean-forward="false" selection-start-line="179" selection-start-column="34" selection-end-line="179" selection-end-column="34" />
+        <state relative-caret-position="153">
+          <caret line="9" column="18" lean-forward="true" selection-start-line="9" selection-start-column="18" selection-end-line="9" selection-end-column="18" />
           <folding>
-            <element signature="e#87#108#0" expanded="true" />
-            <element signature="e#10382#10453#0" expanded="false" />
-            <element signature="e#10535#11362#0" expanded="false" />
-            <element signature="e#11426#12280#0" expanded="false" />
-            <element signature="e#12331#12706#0" expanded="false" />
-            <element signature="e#12755#13961#0" expanded="false" />
-            <element signature="e#14020#14165#0" expanded="false" />
+            <element signature="e#10417#10488#0" expanded="false" />
+            <element signature="e#14118#14263#0" expanded="false" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/teststrategy.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="238">
-          <caret line="218" column="47" lean-forward="true" selection-start-line="218" selection-start-column="47" selection-end-line="218" selection-end-column="47" />
+        <state relative-caret-position="177">
+          <caret line="197" column="37" lean-forward="false" selection-start-line="197" selection-start-column="37" selection-end-line="197" selection-end-column="37" />
           <folding>
             <element signature="e#151#170#0" expanded="true" />
-            <element signature="e#4721#5051#0" expanded="false" />
-            <element signature="e#5130#7155#0" expanded="false" />
+            <element signature="e#365#1776#0" expanded="false" />
+            <element signature="e#1849#4666#0" expanded="false" />
+            <element signature="e#4731#5061#0" expanded="false" />
+            <element signature="e#5140#7165#0" expanded="false" />
           </folding>
         </state>
       </provider>

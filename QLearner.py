@@ -13,7 +13,7 @@ class QLearner(object):
 
     def __init__(self,
                  num_states=100,
-                 num_actions=4,
+                 num_actions=3,
                  alpha=0.2,
                  gamma=0.9,
                  rar=0.98,
@@ -67,6 +67,7 @@ class QLearner(object):
         @summary: Update the Q table and return an action
         @param s_prime: The new state
         @param r: The ne state
+        @iteration: helps to decide whether this run is the first iteration, if yes, no dyna
         @returns: The selected action
         """
         # check if this is the first iteration, if yes, no dyna

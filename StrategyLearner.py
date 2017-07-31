@@ -9,6 +9,7 @@ import pandas as pd
 import util as ut
 import numpy as np
 import math
+import os
 from util import symbol_to_path, add_bband, add_MACD, add_mmt
 
 
@@ -23,7 +24,7 @@ class StrategyLearner(object):
         self.states_log = []
         self.test_log = []
         self.evi_states = []
-        self.learner = ql.QLearner()
+        self.learner = ql.QLearner()  # just a place holder
         self.df = pd.DataFrame()  # for training
         self.tdf = pd.DataFrame()  # for test
         if indicators is None:
@@ -80,12 +81,12 @@ class StrategyLearner(object):
         # without considering holdings, get partial states based on indicators all at once
         self.df['Ind_States'] = self._get_state(self.df[self.indicators])
 
-        self.learner = ql.QLearner(num_states=3000,
+        self.learner = ql.QLearner(num_states=10**len(self.indicators)*3,
                                    num_actions=3,
                                    dyna=200,
                                    rar=0.999,
-                                   radr=0.999,
-                                   gamma=0.9,
+                                   radr=0.9999,
+                                   gamma=0.99,
                                    verbose=False)
 
         bestr = 0.0
@@ -109,7 +110,7 @@ class StrategyLearner(object):
                     action = 1
 
                 # set the s prime state and holdings according to action
-                newstate, newhold = self.set_sprime(self.df,next_day,holdings,action)
+                newstate, newhold = self._set_sprime(self.df,next_day,holdings,action)
 
                 if newstate not in self.states_log:
                     self.states_log.append(newstate)
@@ -121,6 +122,7 @@ class StrategyLearner(object):
                 # big number to wash out random initiation of Q-table
                 rwd = 100*(portv - portv_old)/portv
                 # query for the next action
+
                 action = self.learner.query(newstate, rwd, iteration)
 
                 holdings = newhold
@@ -129,7 +131,7 @@ class StrategyLearner(object):
                 next_day = date_index[today_date+1]
 
             print 'CumRet is:', float(portv)/sv - 1
-            if output == True and iteration > 50:  # record the best portv after 50 iterations
+            if output:  # record the best portv
                 if float(portv)/sv - 1 > bestr:
                     bestr = float(portv)/sv - 1
             print 'Explored states:', len(self.states_log)
@@ -199,7 +201,7 @@ class StrategyLearner(object):
                 action = 1
 
             # set the s prime state according to action
-            newstate, newhold = self.set_sprime(self.tdf, next_day, holdings, action)
+            newstate, newhold = self._set_sprime(self.tdf, next_day, holdings, action)
             # record states
             if newstate not in self.test_log:
                 self.test_log.append(newstate)
@@ -247,7 +249,7 @@ class StrategyLearner(object):
         self.states_log.sort()
         logs = {'Learned':self.states_log,'Tested':self.test_log}
         states = pd.DataFrame(logs)
-        states.to_csv(symbol_to_path('States'), index=False)
+        states.to_csv(symbol_to_path('States', base_dir=os.getcwd()), index=False)
 
         return trades
 
@@ -255,8 +257,8 @@ class StrategyLearner(object):
         q_table = self.learner.output_q()
         return q_table, self.div_dict
 
-    @staticmethod
-    def set_sprime(data, date_ind, holdings, action):
+
+    def _set_sprime(self, data, date_ind, holdings, action):
         # action 0 SELL, 1 NOTHING, 2 BUY
         if holdings == 100:
             if action == 2:
@@ -283,7 +285,8 @@ class StrategyLearner(object):
             elif action == 0:
                 pass
                 # print 'Not allowed holdings'
-        s_prime = int(data.loc[date_ind, 'Ind_States'] + 10 * (holdings + 100))
+        s_prime = int(data.loc[date_ind, 'Ind_States'] \
+                      + 10**(len(self.div_dict)-2) * (holdings + 100))
 
         return s_prime, holdings
 
@@ -313,8 +316,9 @@ class StrategyLearner(object):
     def _get_position(self, ind_values):
         # find the sorted position of the indicator value in a divider_list and return as state
         indicator = ind_values.name
+        div = self.div_dict.copy()
         def ind_sorting(ind):
-            lst = self.div_dict[indicator][:]
+            lst = div[indicator][:]
             lst.append(ind)
             lst.sort()
             pos = lst.index(ind)
