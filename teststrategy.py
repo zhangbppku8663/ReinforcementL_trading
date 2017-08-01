@@ -13,6 +13,8 @@ import numpy as np
 from util import symbol_to_path
 import os
 
+import random
+random.seed(42)
 
 def generate_order(data):
     '''
@@ -181,13 +183,12 @@ def print_port(of, sv=1000000, output=False, lvrg=False, symbol='SPY'):
 
 
 def test_code(verb=True):
-
     # instantiate the strategy learner
     learner = sl.StrategyLearner(bins=10, div_method='quantile', indicators=['mmt', 'bbp'], verbose=verb)
 
     # set parameters for training the learner
-    sym = "NUGT"
-    stdate = dt.datetime(2015,1,26)
+    sym = "DUST"
+    stdate = dt.datetime(2016,3,26)
     enddate = dt.datetime(2017,7,1)
     Nbb = 24  # bollinger band looking back window
     Nmmt = 3  # momentum looking back window
@@ -195,14 +196,14 @@ def test_code(verb=True):
     bestr = learner.addEvidence(symbol=sym, sd=stdate,
                                 ed=enddate, sv=25000,
                                 N_bb=Nbb, N_mmt=Nmmt,
-                                it=50, output=True)
+                                it=60, output=True)
     print('Best return is', bestr)
     print('Now rar is:', learner.learner.newrar)
     #############
     # Test
     #############
     st_date = dt.datetime(2017, 7, 1)
-    en_date = dt.datetime(2017, 7, 26)
+    en_date = dt.datetime(2017, 7, 30)
 
     syms = [sym]
     dates = pd.date_range(st_date, en_date)
@@ -247,6 +248,7 @@ def test_code(verb=True):
     # output Q table and indicator divider info
     q, dividers = learner.output()
     q_table = pd.DataFrame(q)
+
     ind_dividers = pd.DataFrame(dividers)
     q_table.to_csv(symbol_to_path('Q_Table', base_dir=os.getcwd()))
     ind_dividers.to_csv(symbol_to_path('Dividers', base_dir=os.getcwd()))

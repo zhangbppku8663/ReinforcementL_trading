@@ -59,7 +59,8 @@ class QLearner(object):
         # save last move info
         self.last_s = s
         self.last_a = action
-
+        # # normalize Q-table to prevent values to go huge
+        # self.Q_table = self.Q_table/sum(sum(self.Q_table))
         return action
 
     def query(self, s_prime, r, iteration):
@@ -70,8 +71,6 @@ class QLearner(object):
         @iteration: helps to decide whether this run is the first iteration, if yes, no dyna
         @returns: The selected action
         """
-        # check if this is the first iteration, if yes, no dyna
-        is_first_iteration = self.newrar is self.rar
         # epsilon greedy select an action
         if rand.random() > self.newrar:
             action = self.Q_table[s_prime].argmax()

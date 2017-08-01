@@ -86,7 +86,7 @@ class StrategyLearner(object):
                                    dyna=200,
                                    rar=0.999,
                                    radr=0.9999,
-                                   gamma=0.99,
+                                   gamma=0.9,
                                    verbose=False)
 
         bestr = 0.0
@@ -257,7 +257,6 @@ class StrategyLearner(object):
         q_table = self.learner.output_q()
         return q_table, self.div_dict
 
-
     def _set_sprime(self, data, date_ind, holdings, action):
         # action 0 SELL, 1 NOTHING, 2 BUY
         if holdings == 100:
@@ -349,7 +348,6 @@ class StrategyLearner(object):
         else:
             state = 0
             print('Warning: we need pandas DataFrame or Series as inputs')
-
         return state.astype('int').flatten()
 
     def _full_state(self, ind_states, holdings):
