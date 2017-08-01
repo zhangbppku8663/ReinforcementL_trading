@@ -185,25 +185,25 @@ def print_port(of, sv=1000000, output=False, lvrg=False, symbol='SPY'):
 def test_code(verb=True):
     # instantiate the strategy learner
     learner = sl.StrategyLearner(bins=10, div_method='quantile', indicators=['mmt', 'bbp'], verbose=verb)
-
     # set parameters for training the learner
-    sym = "DUST"
-    stdate = dt.datetime(2016,3,26)
-    enddate = dt.datetime(2017,7,1)
+    sym = "VIX"
+    money = 2000
+    stdate = dt.datetime(2014,1,1)
+    enddate = dt.datetime(2016,7,31)
     Nbb = 24  # bollinger band looking back window
     Nmmt = 3  # momentum looking back window
     # train the learner
     bestr = learner.addEvidence(symbol=sym, sd=stdate,
-                                ed=enddate, sv=25000,
+                                ed=enddate, sv=money,
                                 N_bb=Nbb, N_mmt=Nmmt,
-                                it=60, output=True)
+                                it=70, output=True)
     print('Best return is', bestr)
     print('Now rar is:', learner.learner.newrar)
     #############
     # Test
     #############
-    st_date = dt.datetime(2017, 7, 1)
-    en_date = dt.datetime(2017, 7, 30)
+    st_date = dt.datetime(2016, 8, 1)
+    en_date = dt.datetime(2017, 7, 31)
 
     syms = [sym]
     dates = pd.date_range(st_date, en_date)
@@ -213,7 +213,7 @@ def test_code(verb=True):
     #
     # test the learner
     df_trades = learner.testPolicy(symbol=sym, sd=st_date, ed=en_date,
-                                   sv=100000, N_bb=Nbb, N_mmt=Nmmt)
+                                   sv=money, N_bb=Nbb, N_mmt=Nmmt)
     #
     # a few sanity checks
     # df_trades should be a series)
@@ -244,7 +244,7 @@ def test_code(verb=True):
     plt.show()
 
     # feed orders to the market simulator and print back-testing outputs
-    print_port(of=orders, sv=10000, output=True, lvrg=False, symbol=sym)
+    print_port(of=orders, sv=money, output=True, lvrg=False, symbol=sym)
     # output Q table and indicator divider info
     q, dividers = learner.output()
     q_table = pd.DataFrame(q)
