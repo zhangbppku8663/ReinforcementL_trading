@@ -10,7 +10,7 @@ import util as ut
 import numpy as np
 import math
 import os
-from util import symbol_to_path, add_bband, add_MACD, add_mmt
+from util import symbol_to_path, add_bband, add_MACD, add_mmt, add_ATR
 
 
 class StrategyLearner(object):
@@ -52,9 +52,10 @@ class StrategyLearner(object):
         syms = [symbol]
         dates = pd.date_range(data_sd, ed)
         data = ut.get_data(syms, dates)  # automatically adds SPY
-        prices = data[syms]  # only portfolio symbols
 
-        if self.verbose: print prices
+        if self.verbose:
+            prices = data[syms]
+            print(prices)
 
         # calculate technical indicators
         for ind in self.indicators:
@@ -64,9 +65,10 @@ class StrategyLearner(object):
                 data = add_mmt(data, N=N_mmt)
             elif ind == 'MACD':
                 data = add_MACD(data)
+            elif ind == 'ATR':
+                data = add_ATR(data, N=14)
             else: print('Method to calculate not implemented!')
         # data['MACD_sig'] = data.MACD - data.Signal
-
         # find the true training starting day when market opened (data_sd is earlier than this day)
         sd = data.index[data.index >= sd][0]
 
@@ -168,6 +170,8 @@ class StrategyLearner(object):
                 data = add_mmt(data, N=N_mmt)
             elif ind == 'MACD':
                 data = add_MACD(data)
+            elif ind == 'ATR':
+                data = add_ATR(data, N=14)
             else: print('Method to calculate not implemented!')
         # data['MACD_sig'] = data.MACD - data.Signal
 
@@ -355,6 +359,7 @@ class StrategyLearner(object):
         state = int((holdings + 100) * 10 ** (len(self.indicators) - 2) + ind_states)
         return state
 
+    # def
 
 if __name__=="__main__":
     print "One does not simply think up a strategy"

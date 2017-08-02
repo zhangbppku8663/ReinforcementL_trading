@@ -4,10 +4,10 @@ Implemented by Eric Zhang since 07/2016
 Q-learner class (part of reinforcement learning algorithm)
 """
 
-import numpy as np
-import random as rand
-import time
 import math
+import random as rand
+import numpy as np
+
 
 class QLearner(object):
 

@@ -95,6 +95,19 @@ def cal_EMA(data_series, N):
 
     return EMA
 
+def add_ATR(data, N=14):
+    symbol = [data.columns.values[1]]  # must be an item of a list, because get_data iterate on it
+    index = data.index  # get all dates that market opens
+    high = get_data(symbols=symbol, dates=index, colname='High')
+    low = get_data(symbols=symbol, dates=index, colname='Low')
+    T_range = pd.DataFrame(index=index)
+    T_range['TR1'] = high[symbol] - low[symbol] # today's high subtracted by today's low
+    T_range['TR2'] = high[symbol] - data[symbol].shift(1)  # today's high subtracted by yesterday's close
+    T_range['TR3'] = data[symbol].shift(1) - low[symbol]  # yesterday's close subtracted by today's low
+    max_TR = T_range.max(axis=1)
+    data['ATR'] = cal_EMA(max_TR, N)
+
+    return data
 
 def add_MACD(data, Ns=None):
     '''

@@ -184,11 +184,11 @@ def print_port(of, sv=1000000, output=False, lvrg=False, symbol='SPY'):
 
 def test_code(verb=True):
     # instantiate the strategy learner
-    learner = sl.StrategyLearner(bins=10, div_method='quantile', indicators=['mmt', 'bbp'], verbose=verb)
+    learner = sl.StrategyLearner(bins=10, div_method='quantile', indicators=['ATR', 'bbp'], verbose=verb)
     # set parameters for training the learner
     sym = "VIX"
     money = 2000
-    stdate = dt.datetime(2014,1,1)
+    stdate = dt.datetime(2013,1,1)
     enddate = dt.datetime(2016,7,31)
     Nbb = 24  # bollinger band looking back window
     Nmmt = 3  # momentum looking back window
@@ -203,7 +203,7 @@ def test_code(verb=True):
     # Test
     #############
     st_date = dt.datetime(2016, 8, 1)
-    en_date = dt.datetime(2017, 7, 31)
+    en_date = dt.datetime(2017, 8, 1)
 
     syms = [sym]
     dates = pd.date_range(st_date, en_date)
@@ -254,5 +254,4 @@ def test_code(verb=True):
     ind_dividers.to_csv(symbol_to_path('Dividers', base_dir=os.getcwd()))
 
 if __name__=="__main__":
-    np.random.seed(1234)
     test_code(verb=False)
