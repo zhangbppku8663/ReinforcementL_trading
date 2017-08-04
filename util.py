@@ -2,9 +2,12 @@
 
 import os
 import matplotlib.pyplot as plt
+import StrategyLearner as sl
+import QLearner as ql
+import util
 import pandas as pd
+import datetime as dt
 import numpy as np
-
 
 def symbol_to_path(symbol, base_dir=os.path.join(os.getcwd(),"data")):
     """Return CSV file path given ticker symbol."""

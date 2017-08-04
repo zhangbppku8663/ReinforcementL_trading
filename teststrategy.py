@@ -6,15 +6,13 @@ test code for the trading strategy using reinforcement learning
 
 import pandas as pd
 import datetime as dt
-import util as ut
 import StrategyLearner as sl
+import QLearner as ql
 import matplotlib.pyplot as plt
 import numpy as np
-from util import symbol_to_path
+from util import symbol_to_path, add_bband, add_ATR, add_mmt, add_MACD, get_data
 import os
 
-import random
-random.seed(42)
 
 def generate_order(data):
     '''
@@ -74,7 +72,7 @@ def compute_portvals(orders_file, start_val=1000000, lvrg=False):
     # symb_vals = ut.get_data(symbols, pd.date_range(start_date, end_date))
     # prtf = prtf.join(symb_vals)
     # prtf = prtf.dropna(subset=["SPY_test"])
-    prtf = ut.get_data(symbols, pd.date_range(start_date, end_date))
+    prtf = get_data(symbols, pd.date_range(start_date, end_date))
     for symbol in symbols:
         prtf[symbol+'_shares'] = 0
 
@@ -150,7 +148,7 @@ def print_port(of, sv=1000000, output=False, lvrg=False, symbol='SPY'):
 
     cum_ret, avg_daily_ret, std_daily_ret, sharpe_ratio = compute_portfolio_stats(portvals)
     # SPX data originally has a'$" in front which creates problem as an improper name
-    symb_vals = ut.get_data([symbol], pd.date_range(start_date, end_date))
+    symb_vals = get_data([symbol], pd.date_range(start_date, end_date))
 
     cum_ret_SPY, avg_daily_ret_SPY, std_daily_ret_SPY, sharpe_ratio_SPY = compute_portfolio_stats(symb_vals.SPY_test)
 
@@ -182,32 +180,93 @@ def print_port(of, sv=1000000, output=False, lvrg=False, symbol='SPY'):
         plt.show()
 
 
+def query_model(sym=['AAPL'], sd=dt.datetime(2017,5,1), ed=dt.datetime(2017,7,1),
+                holdings=None, inds_list=['bbp','ATR'], div_file='Dividers.csv', QT_file='Q_Table.csv'):
+
+    data = get_data(sym, dates=pd.date_range(sd - dt.timedelta(days=35), ed))
+    data = add_bband(data)
+    data = add_ATR(data)
+
+    # make a divider dictionary from saved csv file
+    try:
+        divider = pd.read_csv(div_file, index_col=0)
+    except IOError as e:
+        print(e)
+    div_dict = {};
+    for ind in inds_list:
+        div_dict[ind] = divider[ind].tolist()
+
+    # create a StrategyLearner just to get states
+    sLeaner = sl.StrategyLearner()
+    sLeaner.div_dict = div_dict
+    indicators = data[inds_list].dropna(how='all')
+    states = sLeaner._get_state(indicators)
+    # slicing out only required date range
+    # able to deal with non-trading sd
+    pass_day = 0
+    while sd not in indicators.index.tolist():
+        sd = sd + dt.timedelta(days=1)
+        pass_day += 1
+        if sd > indicators.index[-1]:
+            print('something wrong with the start date')
+            break
+    start_index = indicators.index.get_loc(sd)
+    states = states[start_index:]
+
+    if holdings is None:
+        states = states + 100  # in this two indicator case, assume no holdings
+    else:
+        try:
+            new_holdings = holdings[pass_day:]
+            for i, hold in zip(range(len(states)), new_holdings):
+                states[i] = states[i] + hold
+        except:
+            print('may have different length of holding information in this case')
+
+    try:
+        Q_table = pd.read_csv(QT_file, index_col=0)
+    except IOError as e:
+        print(e)
+    Q_table = np.matrix(Q_table)
+
+    qLearner = ql.QLearner(rar=0)  # no random choice
+    qLearner.Q_table = Q_table
+    look_up = {0: 'SELL', 1: 'NOTHING', 2: 'BUY'}
+    suggestions = []
+    for state in states:
+        suggestions.append(look_up[qLearner.querysetstate(state)])
+    effect_dates = indicators.index[start_index:]
+    guide_df = pd.DataFrame(suggestions, index=effect_dates, columns=['{}'.format(sym[0])])
+
+    return guide_df
+
 def test_code(verb=True):
+    import random
+    random.seed(42)
     # instantiate the strategy learner
-    learner = sl.StrategyLearner(bins=10, div_method='quantile', indicators=['ATR', 'bbp'], verbose=verb)
+    learner = sl.StrategyLearner(bins=10, div_method='even', indicators=['bbp', 'mmt','ATR'], verbose=verb)
     # set parameters for training the learner
-    sym = "VIX"
-    money = 2000
-    stdate = dt.datetime(2013,1,1)
-    enddate = dt.datetime(2016,7,31)
-    Nbb = 24  # bollinger band looking back window
+    sym = "SINE_SLOW"
+    money = 5000
+    stdate = dt.datetime(2010,1,1)
+    enddate = dt.datetime(2011,1,1)
+    Nbb = 22  # bollinger band looking back window
     Nmmt = 3  # momentum looking back window
     # train the learner
-    bestr = learner.addEvidence(symbol=sym, sd=stdate,
-                                ed=enddate, sv=money,
-                                N_bb=Nbb, N_mmt=Nmmt,
+    bestr = learner.addEvidence(symbol=sym, sd=stdate, ed=enddate,
+                                sv=money, N_bb=Nbb, N_mmt=Nmmt,
                                 it=70, output=True)
     print('Best return is', bestr)
     print('Now rar is:', learner.learner.newrar)
     #############
     # Test
     #############
-    st_date = dt.datetime(2016, 8, 1)
-    en_date = dt.datetime(2017, 8, 1)
+    st_date = dt.datetime(2011, 1, 1)
+    en_date = dt.datetime(2012, 1, 1)
 
     syms = [sym]
     dates = pd.date_range(st_date, en_date)
-    prices_all = ut.get_data(syms, dates)  # automatically adds SPY
+    prices_all = get_data(syms, dates)  # automatically adds SPY
     prices = prices_all[syms]  # only portfolio symbols
     if verb: print prices
     #
