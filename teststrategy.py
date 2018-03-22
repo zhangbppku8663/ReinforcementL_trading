@@ -154,21 +154,21 @@ def print_port(of, sv=1000000, output=False, lvrg=False, symbol='SPY'):
 
     if output:
         # Compare portfolio against $SPX
-        print "Date Range: {} to {}".format(start_date, end_date)
+        print("Date Range: {} to {}".format(start_date, end_date))
         print
-        print "Sharpe Ratio of Fund: {}".format(sharpe_ratio)
-        print "Sharpe Ratio of SPY : {}".format(sharpe_ratio_SPY)
+        print("Sharpe Ratio of Fund: {}".format(sharpe_ratio))
+        print("Sharpe Ratio of SPY : {}".format(sharpe_ratio_SPY))
         print
-        print "Cumulative Return of Fund: {}".format(cum_ret)
-        print "Cumulative Return of SPY : {}".format(cum_ret_SPY)
+        print("Cumulative Return of Fund: {}".format(cum_ret))
+        print("Cumulative Return of SPY : {}".format(cum_ret_SPY))
         print
-        print "Standard Deviation of Fund: {}".format(std_daily_ret)
-        print "Standard Deviation of SPY : {}".format(std_daily_ret_SPY)
+        print("Standard Deviation of Fund: {}".format(std_daily_ret))
+        print("Standard Deviation of SPY : {}".format(std_daily_ret_SPY))
         print
-        print "Average Daily Return of Fund: {}".format(avg_daily_ret)
-        print "Average Daily Return of SPY : {}".format(avg_daily_ret_SPY)
+        print("Average Daily Return of Fund: {}".format(avg_daily_ret))
+        print("Average Daily Return of SPY : {}".format(avg_daily_ret_SPY))
         print
-        print "Final Portfolio Value: {}".format(portvals[-1])
+        print("Final Portfolio Value: {}".format(portvals[-1]))
 
         norm_port = portvals / portvals[0]
         norm_SPY = symb_vals.SPY_test / symb_vals.SPY_test[0]
@@ -192,7 +192,7 @@ def query_model(sym=['AAPL'], sd=dt.datetime(2017,5,1), ed=dt.datetime(2017,7,1)
         divider = pd.read_csv(div_file, index_col=0)
     except IOError as e:
         print(e)
-    div_dict = {};
+    div_dict = {}
     for ind in inds_list:
         div_dict[ind] = divider[ind].tolist()
 
@@ -244,12 +244,12 @@ def test_code(verb=True):
     import random
     random.seed(42)
     # instantiate the strategy learner
-    learner = sl.StrategyLearner(bins=10, div_method='even', indicators=['bbp', 'mmt','ATR'], verbose=verb)
+    learner = sl.StrategyLearner(bins=10, div_method='quantile', indicators=['bbp','ATR'], verbose=verb)
     # set parameters for training the learner
-    sym = "SINE_SLOW"
-    money = 5000
-    stdate = dt.datetime(2010,1,1)
-    enddate = dt.datetime(2011,1,1)
+    sym = "VIX"
+    money = 3000
+    stdate = dt.datetime(2013,1,1)
+    enddate = dt.datetime(2017,5,1)
     Nbb = 22  # bollinger band looking back window
     Nmmt = 3  # momentum looking back window
     # train the learner
@@ -261,14 +261,14 @@ def test_code(verb=True):
     #############
     # Test
     #############
-    st_date = dt.datetime(2011, 1, 1)
-    en_date = dt.datetime(2012, 1, 1)
+    st_date = dt.datetime(2017, 5, 1)
+    en_date = dt.datetime(2017, 8, 15)
 
     syms = [sym]
     dates = pd.date_range(st_date, en_date)
     prices_all = get_data(syms, dates)  # automatically adds SPY
     prices = prices_all[syms]  # only portfolio symbols
-    if verb: print prices
+    if verb: print(prices)
     #
     # test the learner
     df_trades = learner.testPolicy(symbol=sym, sd=st_date, ed=en_date,
@@ -278,16 +278,16 @@ def test_code(verb=True):
     # df_trades should be a series)
     # including only the values 100, 0, -100
     if type(df_trades) is not pd.core.series.Series:
-        print "Returned result is not a Series"
+        print("Returned result is not a Series")
     if prices.shape != df_trades.shape:
-        print "Returned result is not the right shape"
+        print("Returned result is not the right shape")
     tradecheck = abs(df_trades.cumsum()).values
     tradecheck[tradecheck <= 100] = 0
     tradecheck[tradecheck > 0] = 1
     if tradecheck.sum(axis=0) > 0:
-        print "Returned result violates holding restrictions (more than 100 shares)"
+        print("Returned result violates holding restrictions (more than 100 shares)")
 
-    if verb: print df_trades
+    if verb: print(df_trades)
 
     # generate orders based on principle
     orders, l_en, s_en, ext = generate_order(df_trades)
@@ -314,3 +314,5 @@ def test_code(verb=True):
 
 if __name__=="__main__":
     test_code(verb=False)
+    # rec = query_model(sym=['VIX'], sd=dt.datetime(2017, 5, 1), ed=dt.datetime(2017, 8, 1))
+    # print(rec)

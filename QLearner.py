@@ -49,13 +49,13 @@ class QLearner(object):
         """
         self.s = s
         # randomly select an action
-        if rand.random > self.rar:
+        if rand.random() > self.rar:
             action = self.Q_table[s].argmax()
         else:
             action = int(math.floor((rand.random() * self.num_actions)))
         # self.rar *= self.radr  # decaying random action
 
-        if self.verbose: print "s =", s,"a =",action
+        if self.verbose: print("s =", s,"a =",action)
         # save last move info
         self.last_s = s
         self.last_a = action
@@ -82,7 +82,7 @@ class QLearner(object):
         self.Q_table[self.last_s, self.last_a] += \
             self.alpha*(r + self.gamma*self.Q_table[s_prime].max() - self.Q_table[self.last_s, self.last_a])
 
-        if self.verbose: print "s =", s_prime,"a =",action,"r =",r
+        if self.verbose: print("s = {0}; a = {1}; r = {2}".format(s_prime, action,r))
 
         # if self.dyna and (not is_first_iteration): # make sure we dont do dyna at the first query
         if self.dyna and iteration:
@@ -110,4 +110,4 @@ class QLearner(object):
         return self.Q_table
 
 if __name__=="__main__":
-    print "Remember Q from Star Trek? Well, this isn't him"
+    print("Remember Q from Star Trek? Well, this isn't him")

@@ -132,16 +132,16 @@ class StrategyLearner(object):
                 today_date = list(date_index).index(date)
                 next_day = date_index[today_date+1]
 
-            print 'CumRet is:', float(portv)/sv - 1
+            print('CumRet is:', float(portv)/sv - 1)
             if output:  # record the best portv
                 if float(portv)/sv - 1 > bestr:
                     bestr = float(portv)/sv - 1
-            print 'Explored states:', len(self.states_log)
-            print iteration, ':', len(date_index), 'days of trading'
+            print('Explored states:', len(self.states_log))
+            print(iteration, ':', len(date_index), 'days of trading')
 
         self.evi_states = list(set(self.df.Ind_States.values))
-        print "We have", len(self.evi_states),"states initially not considering holdings."
-        print "Meaning possible states are", len(self.evi_states)*3
+        print("We have", len(self.evi_states),"states initially not considering holdings.")
+        print("Meaning possible states are", len(self.evi_states)*3)
         # if need the information of cum. ret. and divided states, return them
         if output:
             return bestr
@@ -226,10 +226,10 @@ class StrategyLearner(object):
             today_index = list(date_index).index(date)
             next_day = date_index[today_index+1]
 
-        print float(portv) / sv - 1
+        print(float(portv) / sv - 1)
 
-        if self.verbose: print type(trades) # it better be a Series!
-        if self.verbose: print trades
+        if self.verbose: print(type(trades)) # it better be a Series!
+        if self.verbose: print(trades)
         # if self.verbose: print prices_all
 
         # now check what states have not been explored before
@@ -238,12 +238,12 @@ class StrategyLearner(object):
             test_ind_states.append(int(item%1000))
         possible_states = list(set(test_ind_states))
 
-        print 'Test session hit', len(possible_states),'states.'
+        print('Test session hit', len(possible_states),'states.')
         # get unseen states in test process not considering holdings
         for item in self.tdf.Ind_States:
             if item not in self.df.Ind_States.values:
                 not_seen.append(item)
-        print len(set(not_seen)), "indicator states not seen before in training:",not_seen
+        print(len(set(not_seen)), "indicator states not seen before in training:",not_seen)
 
         self.test_log.sort()
         # fill zeros at the end of testsstates list in order to make the same length
@@ -362,5 +362,5 @@ class StrategyLearner(object):
     # def
 
 if __name__=="__main__":
-    print "One does not simply think up a strategy"
+    print("One does not simply think up a strategy")
 
